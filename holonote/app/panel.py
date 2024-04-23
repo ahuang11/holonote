@@ -25,8 +25,11 @@ class PanelWidgets(Viewer):
         float: pn.widgets.FloatSlider,
     }
 
-    def __init__(self, annotator: Annotator, field_values: dict[str, Any] | None = None):
+    def __init__(
+            self, annotator: Annotator, field_values: dict[str, Any] | None = None, as_popup: bool = False
+        ):
         self.annotator = annotator
+
         self.annotator.snapshot()
         self._widget_mode_group = pn.widgets.RadioButtonGroup(
             name="Mode", options=["+", "-", "✏"], width=90
@@ -44,6 +47,11 @@ class PanelWidgets(Viewer):
         self._fields_widgets = self._create_fields_widgets(self._fields_values)
 
         self._set_standard_callbacks()
+
+        if as_popup:
+            for display in annotator._displays.values():
+                for stream in display._edit_streams:
+                    stream.popup = self.__panel__()
 
     def _add_button_description(self):
         from bokeh.models import Tooltip
